@@ -1,0 +1,254 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum MembershipRole {
+  OWNER
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
+enum IncidentStatus {
+  OPEN
+  RESOLVED
+}
+
+enum IncidentSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum IncidentEventType {
+  OPENED
+  RESOLVED
+}
+
+enum ApiScenarioMethod {
+  GET
+  POST
+  PUT
+  PATCH
+  DELETE
+}
+
+enum ApiScenarioRunStatus {
+  QUEUED
+  RUNNING
+  PASSED
+  FAILED
+  ERROR
+}
+
+enum ApiScenarioRunTrigger {
+  MANUAL
+  SCHEDULED
+  COLLECTION
+}
+
+enum ScenarioSecretType {
+  API_CREDENTIAL
+  SLACK_WEBHOOK
+}
+
+enum ScenarioAssertionType {
+  STATUS_CODE
+  BODY_CONTAINS
+  RESPONSE_TIME_MS
+}
+
+model User {
+  id                       String                    @id @default(cuid())
+  email                    String                    @unique
+  passwordHash             String
+  name                     String
+  emailAlertsEnabled       Boolean                   @default(false)
+  createdAt                DateTime                  @default(now())
+  memberships              Membership[]
+  notifications            IncidentNotification[]
+  apiScenarioNotifications ApiScenarioNotification[]
+}
+
+model Organization {
+  id              String           @id @default(cuid())
+  name            String
+  slug            String           @unique
+  createdAt       DateTime         @default(now())
+  memberships     Membership[]
+  monitors        Monitor[]
+  incidents       Incident[]
+  apiScenarios    ApiScenario[]
+  scenarioSecrets ScenarioSecret[]
+}
+
+model Membership {
+  id             String         @id @default(cuid())
+  userId         String
+  organizationId String
+  role           MembershipRole @default(MEMBER)
+  createdAt      DateTime       @default(now())
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization   Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, organizationId])
+  @@index([organizationId, role])
+}
+
+model Monitor {
+  id             String         @id @default(cuid())
+  organizationId String
+  name           String
+  url            String         @db.VarChar(2048)
+  intervalSec    Int            @default(60)
+  isActive       Boolean        @default(true)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  organization   Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  checks         MonitorCheck[]
+  incidents      Incident[]
+
+  @@index([organizationId, isActive])
+}
+
+model MonitorCheck {
+  id         String   @id @default(cuid())
+  monitorId  String
+  queueJobId String?  @unique
+  checkedAt  DateTime @default(now())
+  success    Boolean
+  statusCode Int?
+  latencyMs  Int
+  error      String?  @db.VarChar(500)
+  monitor    Monitor  @relation(fields: [monitorId], references: [id], onDelete: Cascade)
+
+  @@index([monitorId, checkedAt(sort: Desc)])
+}
+
+model Incident {
+  id             String           @id @default(cuid())
+  organizationId String
+  monitorId      String
+  status         IncidentStatus   @default(OPEN)
+  severity       IncidentSeverity @default(MEDIUM)
+  title          String
+  message        String?          @db.VarChar(1000)
+  startedAt      DateTime         @default(now())
+  resolvedAt     DateTime?
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  monitor        Monitor          @relation(fields: [monitorId], references: [id], onDelete: Cascade)
+  events         IncidentEvent[]
+
+  @@index([organizationId, status, startedAt(sort: Desc)])
+  @@index([monitorId, status])
+}
+
+model IncidentEvent {
+  id            String                 @id @default(cuid())
+  incidentId    String
+  type          IncidentEventType
+  message       String?                @db.VarChar(1000)
+  createdAt     DateTime               @default(now())
+  incident      Incident               @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+  notifications IncidentNotification[]
+
+  @@index([incidentId, createdAt])
+}
+
+model IncidentNotification {
+  id        String        @id @default(cuid())
+  userId    String
+  eventId   String
+  readAt    DateTime?
+  createdAt DateTime      @default(now())
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event     IncidentEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, eventId])
+  @@index([userId, readAt, createdAt(sort: Desc)])
+}
+
+model ApiScenario {
+  id                   String                    @id @default(cuid())
+  organizationId       String
+  collectionName       String                    @default("Geral") @db.VarChar(80)
+  name                 String                    @db.VarChar(80)
+  method               ApiScenarioMethod         @default(GET)
+  url                  String                    @db.VarChar(2048)
+  body                 String?                   @db.VarChar(5000)
+  assertions           Json
+  headers              Json                      @default("[]")
+  scheduleIntervalSec  Int?
+  slackWebhookSecretId String?
+  createdAt            DateTime                  @default(now())
+  updatedAt            DateTime                  @updatedAt
+  organization         Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  runs                 ApiScenarioRun[]
+  slackWebhookSecret   ScenarioSecret?           @relation("ScenarioSlackWebhook", fields: [slackWebhookSecretId], references: [id], onDelete: SetNull)
+  notifications        ApiScenarioNotification[]
+
+  @@index([organizationId, collectionName, createdAt])
+  @@index([organizationId, updatedAt(sort: Desc)])
+}
+
+model ApiScenarioRun {
+  id                 String                    @id @default(cuid())
+  scenarioId         String
+  queueJobId         String?                   @unique
+  trigger            ApiScenarioRunTrigger     @default(MANUAL)
+  status             ApiScenarioRunStatus      @default(QUEUED)
+  requestSnapshot    Json
+  assertionsSnapshot Json
+  assertionResults   Json?
+  responseStatusCode Int?
+  responseTimeMs     Int?
+  responsePreview    String?                   @db.VarChar(4000)
+  error              String?                   @db.VarChar(1000)
+  queuedAt           DateTime                  @default(now())
+  startedAt          DateTime?
+  completedAt        DateTime?
+  scenario           ApiScenario               @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+  notifications      ApiScenarioNotification[]
+
+  @@index([scenarioId, queuedAt(sort: Desc)])
+  @@index([status, queuedAt])
+}
+
+model ScenarioSecret {
+  id             String             @id @default(cuid())
+  organizationId String
+  name           String             @db.VarChar(80)
+  type           ScenarioSecretType
+  ciphertext     String             @db.Text
+  iv             String             @db.VarChar(32)
+  authTag        String             @db.VarChar(32)
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  organization   Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  slackScenarios ApiScenario[]      @relation("ScenarioSlackWebhook")
+
+  @@unique([organizationId, name])
+  @@index([organizationId, type])
+}
+
+model ApiScenarioNotification {
+  id         String         @id @default(cuid())
+  userId     String
+  scenarioId String
+  runId      String
+  readAt     DateTime?
+  createdAt  DateTime       @default(now())
+  user       User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scenario   ApiScenario    @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+  run        ApiScenarioRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, runId])
+  @@index([userId, readAt, createdAt(sort: Desc)])
+  @@index([scenarioId, createdAt(sort: Desc)])
+}

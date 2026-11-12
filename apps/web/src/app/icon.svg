@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <rect width="64" height="64" rx="14" fill="#06070B" />
+  <defs>
+    <linearGradient id="nexus-mark-gradient" x1="12" y1="52" x2="53" y2="11" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8B3DFF" />
+      <stop offset="1" stop-color="#28A9FF" />
+    </linearGradient>
+  </defs>
+  <path d="M15 50V18.5c0-4.4 5.3-6.4 8.5-3.3L50 46V14" stroke="url(#nexus-mark-gradient)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" />
+</svg>

@@ -1,0 +1,281 @@
+/* NEXUS / electric signal brand identity */
+:root {
+  color-scheme: dark;
+  --ink: #f3f5ff;
+  --muted: #9ca7c0;
+  --line: #22283a;
+  --purple: #8b3dff;
+  --sidebar: #05060a;
+  --surface: #0d101b;
+  --canvas: #06070b;
+  --positive: #79e4b5;
+  --warning: #ffc36a;
+  --negative: #ff776e;
+  --signal: #9157ff;
+  --signal-blue: #28a9ff;
+  --focus: #bca3ff;
+}
+
+html,
+body {
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--ui-font);
+  font-size: 14px;
+}
+
+::selection {
+  background: #39205f;
+  color: #fff;
+}
+
+input,
+textarea {
+  caret-color: var(--signal);
+}
+
+* {
+  scrollbar-color: #353047 #0a0b11;
+}
+
+*::-webkit-scrollbar-track {
+  background: #0a0b11;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #353047;
+  border-color: #0a0b11;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+.table-wrap:focus-visible,
+.history-table-wrap:focus-visible {
+  outline-color: var(--focus);
+}
+
+.app-shell,
+.main-area {
+  background: var(--canvas);
+  color: var(--ink);
+}
+
+.sidebar {
+  background: #05060a;
+  border-right-color: #1c2030;
+  color: #c8cce0;
+}
+
+.topbar {
+  background: #080910ed;
+  border-bottom-color: #1d2233;
+}
+
+.brand {
+  align-items: center;
+  gap: 11px;
+  padding-bottom: 29px;
+}
+
+.brand-mark {
+  width: 31px;
+  height: 31px;
+  flex: 0 0 31px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.brand-mark svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.brand-copy {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.brand-word {
+  color: #f4f5ff;
+  font-size: 15px;
+  font-weight: 720;
+  line-height: 1;
+  letter-spacing: 0.22em;
+}
+
+.brand-tagline {
+  color: #a4abc0;
+  font: 8px/1.2 var(--ui-font);
+  letter-spacing: 0.015em;
+  white-space: nowrap;
+}
+
+.workspace-switch {
+  background: #0d0f19;
+  border-color: #25293a;
+  color: #f0f1fa;
+}
+
+.workspace-avatar,
+.profile-avatar,
+.top-avatar {
+  border-color: #443164;
+  background: #191329;
+  color: #c5adff;
+}
+
+.nav-label,
+.nav-section-label {
+  color: #838ba4;
+}
+
+.nav-item:hover {
+  background: #12101d;
+  color: #f3f1ff;
+}
+
+.nav-item:hover svg {
+  color: var(--signal-blue);
+}
+
+.nav-item.active {
+  background: #171128;
+  color: #f2edff;
+  box-shadow: inset 2px 0 var(--purple);
+}
+
+.nav-item.active svg {
+  color: var(--purple);
+}
+
+.plan-card {
+  border-color: #25293a;
+  background: #0c0e17;
+}
+
+.plan-card-top span:last-child {
+  color: #c2a3ff;
+}
+
+.plan-track {
+  background: #25253a;
+}
+
+.plan-track i {
+  background: linear-gradient(90deg, var(--purple), var(--signal-blue));
+  box-shadow: 0 4px 12px #8b3dff45;
+}
+
+.profile {
+  border-color: #25283a;
+}
+
+.button-primary {
+  border-color: var(--purple);
+  background: var(--purple);
+  color: #fff;
+  box-shadow: 0 5px 16px #672bc533;
+}
+
+.button-primary:hover {
+  border-color: #a66bff;
+  background: #a66bff;
+  color: #fff;
+}
+
+.metric-icon.purple {
+  border-color: #443060;
+  background: #1c1430;
+  color: #bd99ff;
+}
+
+.metric-icon.blue {
+  border-color: #244567;
+  background: #101d31;
+  color: #74c5ff;
+}
+
+.uptime-panel {
+  border-top-color: #6840a4;
+}
+
+.uptime-panel::after {
+  background: linear-gradient(90deg, var(--signal), var(--signal-blue));
+  box-shadow: 0 3px 12px #8b3dff45;
+}
+
+.uptime-chart path[fill="none"] {
+  stroke: var(--signal) !important;
+  filter: drop-shadow(0 0 4px #9157ff55);
+}
+
+.uptime-chart stop {
+  stop-color: var(--signal) !important;
+}
+
+.legend-purple {
+  background: linear-gradient(90deg, var(--signal), var(--signal-blue));
+}
+
+.chart-scope {
+  border-color: #34304a;
+  background: #141123;
+  color: #c2a5ff;
+}
+
+.chart-scope i {
+  background: var(--signal-blue);
+}
+
+.time-range {
+  border-color: #29263d;
+  background: #0d0f19;
+  color: #b8b4cd;
+}
+
+.time-range svg {
+  color: var(--signal-blue);
+}
+
+.text-link {
+  color: #b79aff;
+}
+
+.text-link:hover {
+  color: #d0beff;
+}
+
+.count-badge {
+  border-color: #39304d;
+  background: #171226;
+  color: #c6a6ff;
+}
+
+@media (max-width: 900px) {
+  .brand-copy {
+    display: none;
+  }
+}
+
+@media (max-width: 620px) {
+  .brand-mark {
+    width: 27px;
+    height: 27px;
+    flex-basis: 27px;
+  }
+}
+
+@media (max-width: 380px) {
+  .metric-card,
+  .metric-card:nth-child(2),
+  .metric-card:nth-child(n + 3) {
+    border-color: #22283a;
+  }
+}

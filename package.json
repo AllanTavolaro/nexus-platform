@@ -1,0 +1,33 @@
+{
+  "name": "nexus-platform",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/web",
+    "apps/api",
+    "apps/worker"
+  ],
+  "scripts": {
+    "dev": "concurrently -k -n web,api,worker -c cyan,green,yellow \"npm run dev --workspace @nexus/web\" \"npm run start:dev --workspace @nexus/api\" \"npm run dev --workspace @nexus/worker\"",
+    "dev:web": "npm run dev --workspace @nexus/web",
+    "dev:api": "npm run start:dev --workspace @nexus/api",
+    "dev:worker": "npm run dev --workspace @nexus/worker",
+    "build": "npm run build --workspace @nexus/api && npm run build --workspace @nexus/worker && npm run build --workspace @nexus/web",
+    "test": "npm run build --workspace @nexus/api && npm run build --workspace @nexus/worker && node --test",
+    "test:integration": "npm run build --workspace @nexus/api && node scripts/integration-smoke.cjs",
+    "db:generate": "npm run db:generate --workspace @nexus/api",
+    "db:migrate": "npm run db:migrate --workspace @nexus/api",
+    "db:migrate:deploy": "npm run db:migrate:deploy --workspace @nexus/api",
+    "db:studio": "npm run db:studio --workspace @nexus/api",
+    "db:backup": "node scripts/backup-postgres.mjs",
+    "infra:up": "docker compose up -d postgres redis",
+    "infra:down": "docker compose down"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  },
+  "engines": {
+    "node": ">=22.12.0",
+    "npm": ">=10.0.0"
+  }
+}
