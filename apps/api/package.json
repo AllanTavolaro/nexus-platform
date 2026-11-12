@@ -34,7 +34,7 @@
     "@types/express": "^5.0.3",
     "@types/node": "^22.0.0",
     "dotenv-cli": "^8.0.0",
-    "prisma": "^6.19.0",
+    "prisma": "^7.10.1",
     "typescript": "^5.9.0"
   }
 }
