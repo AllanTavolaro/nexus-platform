@@ -24,7 +24,7 @@
     "infra:down": "docker compose down"
   },
   "devDependencies": {
-    "concurrently": "^9.2.1"
+    "concurrently": "^10.0.7"
   },
   "engines": {
     "node": ">=22.12.0",
